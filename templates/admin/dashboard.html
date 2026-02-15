@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <header class="bg-iai-blue text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Dashboard Admin - GL3E</h1>
+            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors">
+                Déconnexion
+            </button>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="text-gray-500 text-sm mb-2">Total Étudiants</div>
+                <div class="text-3xl font-bold text-iai-blue">{{ stats.total_students }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="text-gray-500 text-sm mb-2">Projets Attribués</div>
+                <div class="text-3xl font-bold text-iai-green">{{ stats.students_with_projects }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="text-gray-500 text-sm mb-2">Projets Disponibles</div>
+                <div class="text-3xl font-bold text-iai-gold">{{ stats.projects_not_assigned }}</div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="text-gray-500 text-sm mb-2">Projets en Double</div>
+                <div class="text-3xl font-bold text-orange-500">{{ stats.projects_assigned_twice }}</div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="bg-white rounded-lg shadow p-4 mb-6">
+            <input type="text" id="searchInput" placeholder="Rechercher un étudiant..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-iai-blue focus:border-transparent">
+        </div>
+
+        <!-- Assignments Table -->
+        <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
+            <div class="px-6 py-4 bg-iai-blue text-white font-semibold">
+                Attributions de Projets
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Étudiant</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Matricule</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Projet</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200" id="assignmentsTable">
+                        {% for assignment in assignments %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">{{ assignment.student_name }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ assignment.student_matricule }}</td>
+                            <td class="px-6 py-4 font-medium text-iai-blue">{{ assignment.project_title }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-500">{{ assignment.assigned_at[:10] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Activity Logs -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="px-6 py-4 bg-gray-800 text-white font-semibold">
+                Activité Récente
+            </div>
+            <div class="p-6 space-y-3">
+                {% for log in recent_logs %}
+                <div class="flex items-start space-x-3 pb-3 border-b border-gray-200">
+                    <div class="flex-shrink-0">
+                        {% if log.success %}
+                        <span class="inline-block w-2 h-2 bg-green-500 rounded-full mt-2"></span>
+                        {% else %}
+                        <span class="inline-block w-2 h-2 bg-red-500 rounded-full mt-2"></span>
+                        {% endif %}
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-sm font-medium text-gray-900">
+                            {{ log.student.full_name if log.student else 'Système' }} - {{ log.action }}
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            {{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                            {% if log.contact_method %} | {{ log.contact_method }}{% endif %}
+                            {% if log.sms_provider %} | {{ log.sms_provider }}{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search functionality
+    let allAssignments = {{ assignments | tojson }};
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const search = e.target.value.toLowerCase();
+        const filtered = allAssignments.filter(a =>
+            a.student_name.toLowerCase().includes(search) ||
+            a.project_title.toLowerCase().includes(search)
+        );
+
+        const tbody = document.getElementById('assignmentsTable');
+        tbody.innerHTML = filtered.map(a => `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">${a.student_name}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${a.student_matricule}</td>
+            <td class="px-6 py-4 font-medium text-iai-blue">${a.project_title}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${a.assigned_at.substring(0, 10)}</td>
+        </tr>
+    `).join('');
+    });
+
+    async function logout() {
+        try {
+            await fetch('/admin/api/logout', { method: 'POST' });
+            window.location.href = '/admin/login';
+        } catch (error) {
+            showToast('Erreur de déconnexion', 'error');
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}GL3E - Demander un Projet{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-iai-blue to-blue-900 py-8 px-4">
+    <div class="max-w-md mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="text-3xl font-bold text-white mb-2">Institut Africain d'Informatique</h1>
+            <p class="text-iai-gold text-lg">Attribution de Projets GL3E</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="bg-white rounded-lg shadow-2xl p-6 fade-in">
+            <div id="step1" class="space-y-4">
+                <h2 class="text-2xl font-bold text-iai-blue mb-4">Demander un Projet</h2>
+
+                <!-- Student Selection -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Sélectionnez votre nom
+                    </label>
+                    <select id="studentSelect"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-iai-blue focus:border-transparent">
+                        <option value="">Chargement...</option>
+                    </select>
+                </div>
+
+                <!-- Contact Method -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Méthode de contact
+                    </label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center">
+                            <input type="radio" name="contactMethod" value="email" class="mr-2" checked>
+                            <span>Email</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="contactMethod" value="sms" class="mr-2">
+                            <span>SMS</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Contact Value -->
+                <div>
+                    <label id="contactLabel" class="block text-sm font-medium text-gray-700 mb-2">
+                        Votre email
+                    </label>
+                    <input type="text" id="contactValue" placeholder="exemple@email.com"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-iai-blue focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1" id="contactHint">
+                        Vous recevrez un code de vérification
+                    </p>
+                </div>
+
+                <button onclick="requestOTP()"
+                    class="w-full bg-iai-blue text-white py-3 rounded-lg font-semibold hover:bg-blue-900 transition-colors">
+                    Me donner un thème
+                </button>
+            </div>
+
+            <!-- OTP Verification Step -->
+            <div id="step2" class="hidden space-y-4">
+                <h2 class="text-2xl font-bold text-iai-blue mb-4">Vérification</h2>
+                <p class="text-gray-600 mb-4">
+                    Un code de vérification a été envoyé à <span id="sentTo" class="font-semibold"></span>
+                </p>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Code OTP (6 chiffres)
+                    </label>
+                    <input type="text" id="otpCode" maxlength="6" placeholder="000000"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-2xl font-bold focus:ring-2 focus:ring-iai-blue focus:border-transparent">
+                </div>
+
+                <button onclick="verifyOTP()"
+                    class="w-full bg-iai-green text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors">
+                    Vérifier et obtenir mon projet
+                </button>
+
+                <button onclick="backToStep1()"
+                    class="w-full bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition-colors">
+                    Retour
+                </button>
+            </div>
+
+            <!-- Success Step -->
+            <div id="step3" class="hidden space-y-4 text-center">
+                <div class="text-6xl mb-4">🎉</div>
+                <h2 class="text-2xl font-bold text-iai-green mb-4">Félicitations!</h2>
+                <p class="text-gray-600 mb-4">Votre projet a été attribué:</p>
+
+                <div class="bg-iai-blue bg-opacity-10 p-6 rounded-lg">
+                    <h3 id="projectTitle" class="text-xl font-bold text-iai-blue mb-2"></h3>
+                    <p id="projectDesc" class="text-gray-700"></p>
+                </div>
+
+                <p class="text-sm text-gray-500 mt-4">
+                    Vous pouvez maintenant fermer cette page.
+                </p>
+            </div>
+        </div>
+
+        <!-- Public Link -->
+        <div class="text-center mt-6">
+            <a href="/projets-attribues" class="text-white hover:text-iai-gold transition-colors">
+                Voir tous les projets attribués →
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    let otpId = null;
+
+    // Load students on page load
+    window.addEventListener('DOMContentLoaded', async () => {
+        try {
+            const response = await fetch('/api/students');
+            const students = await response.json();
+
+            const select = document.getElementById('studentSelect');
+            select.innerHTML = '<option value="">-- Sélectionnez votre nom --</option>';
+            students.forEach(s => {
+                const option = document.createElement('option');
+                option.value = s.name;
+                option.textContent = `${s.name} (${s.matricule})`;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            showToast('Erreur de chargement des étudiants', 'error');
+        }
+    });
+
+    // Update contact input based on method
+    document.querySelectorAll('input[name="contactMethod"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const label = document.getElementById('contactLabel');
+            const input = document.getElementById('contactValue');
+            const hint = document.getElementById('contactHint');
+
+            if (e.target.value === 'email') {
+                label.textContent = 'Votre email';
+                input.placeholder = 'exemple@email.com';
+                hint.textContent = 'Vous recevrez un code de vérification par email';
+            } else {
+                label.textContent = 'Votre numéro de téléphone';
+                input.placeholder = '6XX XX XX XX';
+                hint.textContent = 'Format camerounais uniquement (6XX XX XX XX)';
+            }
+        });
+    });
+
+    async function requestOTP() {
+        const studentName = document.getElementById('studentSelect').value;
+        const contactMethod = document.querySelector('input[name="contactMethod"]:checked').value;
+        const contactValue = document.getElementById('contactValue').value;
+
+        if (!studentName) {
+            showToast('Veuillez sélectionner votre nom', 'error');
+            return;
+        }
+
+        if (!contactValue) {
+            showToast('Veuillez entrer votre ' + (contactMethod === 'email' ? 'email' : 'numéro'), 'error');
+            return;
+        }
+
+        showLoading();
+
+        try {
+            const response = await fetch('/api/request-project', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    student_name: studentName,
+                    contact_type: contactMethod,
+                    contact_value: contactValue
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Erreur lors de la demande');
+            }
+
+            otpId = data.otp_id;
+            document.getElementById('sentTo').textContent = contactValue;
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+            showToast(data.message, 'success');
+
+        } catch (error) {
+            showToast(error.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    async function verifyOTP() {
+        const code = document.getElementById('otpCode').value;
+
+        if (!code || code.length !== 6) {
+            showToast('Veuillez entrer le code à 6 chiffres', 'error');
+            return;
+        }
+
+        showLoading();
+
+        try {
+            const response = await fetch('/api/verify-otp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    otp_id: otpId,
+                    code: code
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.detail || 'Code incorrect');
+            }
+
+            document.getElementById('projectTitle').textContent = data.project.title;
+            document.getElementById('projectDesc').textContent = data.project.description;
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.remove('hidden');
+
+        } catch (error) {
+            showToast(error.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    function backToStep1() {
+        document.getElementById('step2').classList.add('hidden');
+        document.getElementById('step1').classList.remove('hidden');
+        document.getElementById('otpCode').value = '';
+    }
+</script>
+{% endblock %}

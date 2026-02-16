@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}GL3E - Attribution de Projets{% endblock %}</title>
+    <link rel="icon" type="image/png" href="/static/img/image.png">
+    <link rel="apple-touch-icon" href="/static/img/image.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -12,63 +14,57 @@
                     colors: {
                         'iai-blue': '#1e3a8a',
                         'iai-gold': '#fbbf24',
-                        'iai-green': '#10b981',
+                        'iai-green': '#059669',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
         }
     </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .spinner {
+        .loading-spinner {
             border: 3px solid #f3f3f3;
             border-top: 3px solid #1e3a8a;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 24px;
+            height: 24px;
             animation: spin 1s linear infinite;
         }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
+    <link href="/static/css/custom.css" rel="stylesheet">
     {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gray-50 min-h-screen">
     {% block content %}{% endblock %}
     
+    <script src="/static/js/utils.js"></script>
     <script>
-        // Toast notification system
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg text-white fade-in z-50 ${
-                type === 'success' ? 'bg-iai-green' :
-                type === 'error' ? 'bg-red-500' :
-                'bg-iai-blue'
-            }`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(-20px)';
-                toast.style.transition = 'all 0.3s';
-                setTimeout(() => toast.remove(), 300);
-            }, 4000);
-        }
+        // Compatibility wrappers for existing templates
+        window.showToast = (msg, type) => Toast.show(msg, type);
         
-        // Loading spinner
         function showLoading() {
             const loading = document.createElement('div');
             loading.id = 'loading-overlay';
             loading.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-            loading.innerHTML = '<div class="spinner"></div>';
+            loading.innerHTML = '<div class="loader"></div>';
             document.body.appendChild(loading);
         }
         

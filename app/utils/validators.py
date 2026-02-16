@@ -5,6 +5,10 @@ import re
 from typing import Tuple
 
 
+_STUDENT_NAME_PATTERN = re.compile(r"^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,120}$")
+_DISALLOWED_INPUT_PATTERN = re.compile(r"[<>{}\\;$`]")
+
+
 def validate_email(email: str) -> Tuple[bool, str]:
     """
     Validate email format
@@ -25,6 +29,32 @@ def validate_email(email: str) -> Tuple[bool, str]:
         return False, "Format d'email invalide"
     
     return True, ""
+
+
+def validate_student_name(name: str) -> Tuple[bool, str]:
+    """
+    Validate student name with strict character whitelist.
+    """
+    if not name:
+        return False, "Nom étudiant requis"
+
+    clean = name.strip()
+    if len(clean) < 2 or len(clean) > 120:
+        return False, "Nom étudiant invalide (longueur)"
+
+    if not _STUDENT_NAME_PATTERN.match(clean):
+        return False, "Nom étudiant invalide (caractères non autorisés)"
+
+    return True, ""
+
+
+def has_disallowed_input(value: str) -> bool:
+    """
+    Detect obvious dangerous characters or payload markers.
+    """
+    if not value:
+        return False
+    return bool(_DISALLOWED_INPUT_PATTERN.search(value))
 
 
 def sanitize_input(text: str, max_length: int = 255) -> str:
@@ -49,5 +79,8 @@ def sanitize_input(text: str, max_length: int = 255) -> str:
     
     # Remove any HTML tags (basic protection)
     text = re.sub(r'<[^>]+>', '', text)
+
+    # Normalize internal spacing
+    text = re.sub(r"\s+", " ", text)
     
     return text

@@ -1,0 +1,63 @@
+/* Custom IAI Styles */
+:root {
+    --iai-blue: #1e3a8a;
+    --iai-gold: #fbbf24;
+    --iai-green: #10b981;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.bg-iai-blue { background-color: var(--iai-blue); }
+.text-iai-blue { color: var(--iai-blue); }
+.border-iai-blue { border-color: var(--iai-blue); }
+
+.bg-iai-gold { background-color: var(--iai-gold); }
+.text-iai-gold { color: var(--iai-gold); }
+
+.bg-iai-green { background-color: var(--iai-green); }
+.text-iai-green { color: var(--iai-green); }
+
+/* Animations */
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-in {
+    animation: slideIn 0.4s ease-out forwards;
+}
+
+/* Toast Notifications */
+.toast {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    transition: all 0.3s ease;
+}
+
+.toast-success { background-color: var(--iai-green); }
+.toast-error { background-color: #ef4444; }
+.toast-info { background-color: var(--iai-blue); }
+
+/* Loading Spinner */
+.loader {
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid var(--iai-blue);
+    width: 24px;
+    height: 24px;
+    -webkit-animation: spin 1s linear infinite; /* Safari */
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

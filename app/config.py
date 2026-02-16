@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     DEBUG: bool = False
     DOMAIN: str = "stephanezoa.online"
+    CORS_ORIGINS: str = "http://localhost:8000,http://127.0.0.1:8000"
+    ALLOWED_HOSTS: str = "localhost,127.0.0.1"
+    FORCE_SECURE_COOKIES: bool = False
     
     # Database
     DATABASE_URL: str = "sqlite:///./gl3e_assignments.db"
@@ -41,6 +44,7 @@ class Settings(BaseSettings):
     OTP_LENGTH: int = 6
     OTP_EXPIRY_MINUTES: int = 5
     OTP_MAX_ATTEMPTS: int = 3
+    OTP_CONTACT_MAX_REQUESTS: int = 2
     
     # Admin
     ADMIN_USERNAME: str = "admin"

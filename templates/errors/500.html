@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Erreur interne{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-red-950 via-gray-900 to-black flex items-center justify-center px-4 relative overflow-hidden">
+    <!-- Glitch background effect -->
+    <div class="absolute inset-0 opacity-10">
+        <div class="animate-glitch-bg w-full h-full" style="background-image: repeating-linear-gradient(0deg, #dc2626 0px, transparent 2px, transparent 4px, #dc2626 4px), repeating-linear-gradient(90deg, #dc2626 0px, transparent 2px, transparent 4px, #dc2626 4px); background-size: 100px 100px;"></div>
+    </div>
+
+    <!-- Floating error symbols -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+        <div class="absolute top-[15%] left-[10%] text-2xl animate-float-error opacity-30">⚠️</div>
+        <div class="absolute top-[25%] right-[20%] text-3xl animate-float-error-delay-1 opacity-30">💥</div>
+        <div class="absolute bottom-[20%] left-[15%] text-2xl animate-float-error-delay-2 opacity-30">🔥</div>
+        <div class="absolute bottom-[30%] right-[15%] text-3xl animate-float-error-delay-3 opacity-30">⚡</div>
+        <div class="absolute top-[50%] left-[5%] text-xl animate-float-error-delay-4 opacity-30">❌</div>
+    </div>
+
+    <div class="max-w-3xl w-full relative z-10">
+        <!-- Crash report terminal -->
+        <div class="bg-gray-900 rounded-xl shadow-2xl overflow-hidden border-2 border-red-600/50 animate-shake-once">
+            <!-- Terminal header with warning -->
+            <div class="bg-gradient-to-r from-red-900 to-red-800 px-4 py-3 flex items-center gap-3 border-b-2 border-red-600">
+                <div class="flex gap-2">
+                    <div class="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                    <div class="w-3 h-3 rounded-full bg-red-500 animate-pulse" style="animation-delay: 0.2s;"></div>
+                    <div class="w-3 h-3 rounded-full bg-red-500 animate-pulse" style="animation-delay: 0.4s;"></div>
+                </div>
+                <div class="flex-1 text-center flex items-center justify-center gap-2">
+                    <span class="text-red-200 text-sm font-mono font-bold animate-pulse">⚠️ CRITICAL ERROR</span>
+                </div>
+            </div>
+
+            <!-- Crash content -->
+            <div class="p-6 sm:p-8 font-mono text-sm">
+                <!-- Logo with glitch -->
+                <div class="flex justify-center mb-6">
+                    <div class="relative">
+                        <img src="/static/img/image.png" alt="IAI" class="h-20 w-20 object-contain animate-glitch-image">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="text-6xl text-red-500 animate-ping opacity-75">💀</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error code display -->
+                <div class="bg-red-950/50 border-2 border-red-600 rounded-lg p-6 mb-6 animate-fade-in">
+                    <div class="text-center">
+                        <div class="text-6xl sm:text-7xl font-black text-red-500 mb-2 animate-glitch-text">
+                            500
+                        </div>
+                        <div class="text-xl sm:text-2xl font-bold text-red-400 mb-2">
+                            Internal Server Error
+                        </div>
+                        <div class="text-sm text-gray-400">
+                            Something went <span class="text-red-400 font-bold">critically</span> wrong
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crash details -->
+                <div class="space-y-3 mb-6">
+                    <!-- Command line -->
+                    <div class="flex items-start gap-2 text-gray-400">
+                        <span class="text-red-400">$</span>
+                        <span class="text-red-300">systemctl status iai-gl3e.service</span>
+                    </div>
+
+                    <!-- Error output -->
+                    <div class="bg-black/50 rounded-lg p-4 border border-red-900/50 space-y-2">
+                        <div class="flex items-start gap-2">
+                            <span class="text-red-500 font-bold">●</span>
+                            <div class="flex-1">
+                                <p class="text-red-400 font-bold">Service Status: <span class="text-red-500 animate-pulse">FAILED</span></p>
+                                <p class="text-gray-400 text-xs mt-1">Process exited with error code 1</p>
+                            </div>
+                        </div>
+
+                        <!-- Exception details -->
+                        <div class="mt-3 pt-3 border-t border-red-900/30">
+                            <p class="text-red-400 text-xs mb-2 font-bold">Exception Traceback:</p>
+                            <div class="space-y-1 text-gray-500 text-xs pl-4 border-l-2 border-red-800">
+                                <div class="animate-fade-in" style="animation-delay: 0.5s; animation-fill-mode: both; opacity: 0;">
+                                    <span class="text-gray-600">File</span> <span class="text-blue-400">"main.py"</span>, line 142
+                                </div>
+                                <div class="animate-fade-in" style="animation-delay: 0.7s; animation-fill-mode: both; opacity: 0;">
+                                    <span class="text-gray-600">in</span> <span class="text-yellow-400">process_request()</span>
+                                </div>
+                                <div class="animate-fade-in" style="animation-delay: 0.9s; animation-fill-mode: both; opacity: 0;">
+                                    <span class="text-red-400">InternalServerError:</span> Unexpected system failure
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Request ID -->
+                        <div class="mt-3 pt-3 border-t border-red-900/30">
+                            <p class="text-gray-500 text-xs">
+                                <span class="text-gray-600">Request ID:</span> 
+                                <span class="text-blue-400 font-mono">{{ request_id }}</span>
+                            </p>
+                            <p class="text-gray-500 text-xs mt-1">
+                                <span class="text-gray-600">Timestamp:</span> 
+                                <span class="text-purple-400 font-mono" id="timestamp"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Recovery suggestion -->
+                    <div class="mt-4 p-4 bg-yellow-900/20 border border-yellow-700/30 rounded-lg">
+                        <div class="flex items-start gap-3">
+                            <span class="text-yellow-400 text-lg animate-bounce">⚡</span>
+                            <div class="flex-1 text-gray-300 text-xs">
+                                <p class="font-bold text-yellow-400 mb-2">Tentatives de récupération :</p>
+                                <ul class="space-y-1 list-disc list-inside">
+                                    <li>Rechargement de la page</li>
+                                    <li>Vérification de votre connexion</li>
+                                    <li>Réessayer dans quelques instants</li>
+                                    <li>Contacter le support si le problème persiste</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Debug info -->
+                    <div class="mt-4 p-3 bg-gray-950 border border-gray-800 rounded-lg">
+                        <div class="flex items-center gap-2 mb-2">
+                            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                            <span class="text-gray-400 text-xs font-bold">SYSTEM DIAGNOSTIC</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="text-gray-500">Server: <span class="text-red-400">DOWN</span></div>
+                            <div class="text-gray-500">Database: <span class="text-yellow-400">DEGRADED</span></div>
+                            <div class="text-gray-500">API: <span class="text-red-400">ERROR</span></div>
+                            <div class="text-gray-500">Cache: <span class="text-green-400">OK</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 mt-6">
+                    <button onclick="location.reload()" 
+                            class="flex-1 group relative overflow-hidden px-4 py-3 bg-gradient-to-r from-red-600 to-red-700 rounded-lg text-white font-semibold text-center transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-red-500/50">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5 transition-transform duration-500 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Réessayer
+                        </span>
+                        <div class="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    </button>
+
+                    <a href="/" 
+                       class="flex-1 group px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-semibold text-center transition-all duration-300 hover:scale-105 hover:shadow-lg">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            Retour sûr
+                        </span>
+                    </a>
+
+                    <a href="mailto:support@iai-cm.com" 
+                       class="flex-1 group px-4 py-3 bg-blue-900 hover:bg-blue-800 rounded-lg text-white font-semibold text-center transition-all duration-300 hover:scale-105">
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            Support
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- System status footer -->
+        <div class="mt-6 text-center opacity-0 animate-fade-in" style="animation-delay: 1s; animation-fill-mode: both;">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-red-950/50 border border-red-800 rounded-lg">
+                <div class="flex gap-1">
+                    <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
+                    <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
+                </div>
+                <p class="text-gray-400 text-xs font-mono">
+                    IAI-GL3E System | Status: <span class="text-red-400 font-bold">CRITICAL</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom animations */
+    @keyframes glitch-bg {
+        0%, 100% { transform: translate(0, 0); }
+        33% { transform: translate(2px, -2px); }
+        66% { transform: translate(-2px, 2px); }
+    }
+
+    @keyframes float-error {
+        0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+        25% { transform: translateY(-30px) rotate(-5deg); opacity: 0.5; }
+        50% { transform: translateY(-60px) rotate(0deg); opacity: 0.3; }
+        75% { transform: translateY(-30px) rotate(5deg); opacity: 0.5; }
+    }
+
+    @keyframes shake-once {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    @keyframes glitch-image {
+        0%, 100% { transform: translate(0); filter: none; }
+        20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+        40% { transform: translate(2px, -2px); filter: hue-rotate(-90deg); }
+        60% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+        80% { transform: translate(2px, 2px); filter: hue-rotate(-180deg); }
+    }
+
+    @keyframes glitch-text {
+        0%, 100% { transform: translate(0); text-shadow: 0 0 0 transparent; }
+        20% { transform: translate(-2px, 0); text-shadow: 2px 0 #dc2626; }
+        40% { transform: translate(2px, 0); text-shadow: -2px 0 #dc2626; }
+        60% { transform: translate(0, -2px); text-shadow: 0 2px #dc2626; }
+        80% { transform: translate(0, 2px); text-shadow: 0 -2px #dc2626; }
+    }
+
+    @keyframes fade-in {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-glitch-bg {
+        animation: glitch-bg 0.3s infinite;
+    }
+
+    .animate-float-error {
+        animation: float-error 6s ease-in-out infinite;
+    }
+
+    .animate-float-error-delay-1 {
+        animation: float-error 6s ease-in-out infinite;
+        animation-delay: 1s;
+    }
+
+    .animate-float-error-delay-2 {
+        animation: float-error 6s ease-in-out infinite;
+        animation-delay: 2s;
+    }
+
+    .animate-float-error-delay-3 {
+        animation: float-error 6s ease-in-out infinite;
+        animation-delay: 1.5s;
+    }
+
+    .animate-float-error-delay-4 {
+        animation: float-error 6s ease-in-out infinite;
+        animation-delay: 0.5s;
+    }
+
+    .animate-shake-once {
+        animation: shake-once 0.6s ease-in-out;
+    }
+
+    .animate-glitch-image {
+        animation: glitch-image 3s infinite;
+    }
+
+    .animate-glitch-text {
+        animation: glitch-text 2s infinite;
+    }
+
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out forwards;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set current timestamp
+        const now = new Date();
+        const timestamp = now.toISOString();
+        document.getElementById('timestamp').textContent = timestamp;
+
+        // Console error message
+        console.error('%c💥 CRITICAL ERROR 500', 'color: #dc2626; font-size: 20px; font-weight: bold; font-family: monospace;');
+        console.error('%cInternal Server Error', 'color: #ef4444; font-size: 14px; font-family: monospace;');
+        console.error('%cRequest ID: {{ request_id }}', 'color: #60a5fa; font-size: 12px; font-family: monospace;');
+        console.error('%c─────────────────────────────────', 'color: #374151;');
+        console.warn('%cPlease contact support if this persists', 'color: #f59e0b; font-family: monospace;');
+
+        // Add dramatic shake on certain keys
+        let shakeCount = 0;
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && shakeCount < 3) {
+                const terminal = document.querySelector('.bg-gray-900');
+                terminal.classList.remove('animate-shake-once');
+                void terminal.offsetWidth; // Trigger reflow
+                terminal.classList.add('animate-shake-once');
+                shakeCount++;
+            }
+        });
+
+        // Auto-retry countdown (optional, commented out)
+        // let countdown = 10;
+        // const countdownInterval = setInterval(() => {
+        //     countdown--;
+        //     if (countdown <= 0) {
+        //         clearInterval(countdownInterval);
+        //         location.reload();
+        //     }
+        // }, 1000);
+    });
+</script>
+{% endblock %}

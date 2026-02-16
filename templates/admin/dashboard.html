@@ -3,126 +3,279 @@
 {% block title %}Admin - Dashboard{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-100">
-    <!-- Header -->
-    <header class="bg-iai-blue text-white shadow-lg">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Dashboard Admin - GL3E</h1>
-            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition-colors">
-                Déconnexion
-            </button>
+<div class="min-h-screen bg-gradient-to-b from-slate-100 via-white to-slate-100">
+    <header class="bg-gradient-to-r from-iai-blue to-blue-700 text-white shadow-lg sticky top-0 z-20">
+        <div class="max-w-7xl mx-auto px-4 py-3 sm:py-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-white to-slate-100 p-1.5 rounded-full ring-2 ring-white/70 shadow-lg shrink-0">
+                    <img src="/static/img/image.png" alt="IAI Logo" class="h-10 w-10 sm:h-12 sm:w-12 object-contain drop-shadow-md">
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-2xl font-extrabold leading-tight">Admin Console - GL3E</h1>
+                    <p class="text-[11px] sm:text-xs text-blue-100">Pilotage des attributions, suivi et export</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <a href="/admin/api/export-all-themes-zip" target="_blank" class="bg-white/15 hover:bg-white/25 text-white font-bold px-3 py-2 sm:px-4 rounded-lg transition-colors flex items-center text-xs sm:text-sm border border-white/25">
+                    Exporter tous les thèmes (ZIP)
+                </a>
+                <a href="/admin/api/export-pdf" target="_blank" class="bg-iai-gold hover:bg-yellow-500 text-iai-blue font-bold px-3 py-2 sm:px-4 rounded-lg transition-colors flex items-center text-xs sm:text-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Exporter PDF
+                </a>
+                <button onclick="logout()" class="bg-red-500 hover:bg-red-600 px-3 py-2 sm:px-4 rounded-lg transition-colors text-xs sm:text-sm font-semibold">
+                    Déconnexion
+                </button>
+            </div>
         </div>
     </header>
 
-    <div class="container mx-auto px-4 py-8">
-        <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-500 text-sm mb-2">Total Étudiants</div>
-                <div class="text-3xl font-bold text-iai-blue">{{ stats.total_students }}</div>
+    <main class="max-w-7xl mx-auto px-4 py-5 sm:py-8">
+        <section class="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-6">
+            <div class="xl:col-span-2 bg-white rounded-2xl shadow-md border border-slate-200 p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">Vue d'ensemble</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Distribution en temps réel des projets GL3E</p>
+                    </div>
+                    <div class="text-xs text-slate-500 bg-slate-100 px-3 py-1.5 rounded-full">
+                        {{ assignments|length }} attribution(s) enregistrée(s)
+                    </div>
+                </div>
+                {% set student_coverage = ((stats.students_with_projects / stats.total_students * 100) if stats.total_students > 0 else 0) %}
+                {% set project_usage = (((stats.total_projects - stats.projects_not_assigned) / stats.total_projects * 100) if stats.total_projects > 0 else 0) %}
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                            <span>Couverture étudiants</span>
+                            <span>{{ "%.1f"|format(student_coverage) }}%</span>
+                        </div>
+                        <div class="h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-iai-blue to-blue-500" style="width: {{ student_coverage }}%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                            <span>Utilisation du catalogue projets</span>
+                            <span>{{ "%.1f"|format(project_usage) }}%</span>
+                        </div>
+                        <div class="h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-iai-green to-emerald-400" style="width: {{ project_usage }}%"></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs sm:text-sm">
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                            <p class="text-slate-500">Total projets</p>
+                            <p class="text-xl font-bold text-slate-900">{{ stats.total_projects }}</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                            <p class="text-slate-500">Attribués 1x</p>
+                            <p class="text-xl font-bold text-iai-blue">{{ stats.projects_assigned_once }}</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                            <p class="text-slate-500">Attribués 2x</p>
+                            <p class="text-xl font-bold text-orange-500">{{ stats.projects_assigned_twice }}</p>
+                        </div>
+                        <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                            <p class="text-slate-500">Non attribués</p>
+                            <p class="text-xl font-bold text-amber-600">{{ stats.projects_not_assigned }}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-500 text-sm mb-2">Projets Attribués</div>
-                <div class="text-3xl font-bold text-iai-green">{{ stats.students_with_projects }}</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-500 text-sm mb-2">Projets Disponibles</div>
-                <div class="text-3xl font-bold text-iai-gold">{{ stats.projects_not_assigned }}</div>
-            </div>
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="text-gray-500 text-sm mb-2">Projets en Double</div>
-                <div class="text-3xl font-bold text-orange-500">{{ stats.projects_assigned_twice }}</div>
-            </div>
-        </div>
 
-        <!-- Search Bar -->
-        <div class="bg-white rounded-lg shadow p-4 mb-6">
-            <input type="text" id="searchInput" placeholder="Rechercher un étudiant..."
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-iai-blue focus:border-transparent">
-        </div>
-
-        <!-- Assignments Table -->
-        <div class="bg-white rounded-lg shadow overflow-hidden mb-8">
-            <div class="px-6 py-4 bg-iai-blue text-white font-semibold">
-                Attributions de Projets
+            <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-4 sm:p-6">
+                <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-3">Actions rapides</h3>
+                <div class="space-y-2.5">
+                    <a class="block w-full bg-indigo-600 text-white rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-indigo-700 transition-colors text-center"
+                       href="/admin/api/export-all-themes-zip" target="_blank">
+                        Télécharger tous les thèmes (ZIP)
+                    </a>
+                    <a class="block w-full bg-iai-blue text-white rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-blue-700 transition-colors text-center"
+                       href="/admin/api/export-pdf" target="_blank">
+                        Télécharger le rapport PDF
+                    </a>
+                    <a class="block w-full bg-slate-900 text-white rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-black transition-colors text-center"
+                       href="/projets-attribues" target="_blank">
+                        Voir la page publique
+                    </a>
+                    <button onclick="window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'})"
+                            class="w-full bg-slate-100 text-slate-700 rounded-lg px-3 py-2.5 text-sm font-semibold hover:bg-slate-200 transition-colors">
+                        Aller aux logs récents
+                    </button>
+                </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
+        </section>
+
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            <article class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                <p class="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wide">Total Étudiants</p>
+                <p class="text-2xl sm:text-3xl font-black text-iai-blue mt-1">{{ stats.total_students }}</p>
+            </article>
+            <article class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                <p class="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wide">Avec Projet</p>
+                <p class="text-2xl sm:text-3xl font-black text-iai-green mt-1">{{ stats.students_with_projects }}</p>
+            </article>
+            <article class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                <p class="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wide">Sans Projet</p>
+                <p class="text-2xl sm:text-3xl font-black text-slate-700 mt-1">{{ stats.students_without_projects }}</p>
+            </article>
+            <article class="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+                <p class="text-[11px] sm:text-xs text-slate-500 uppercase tracking-wide">Projets en Double</p>
+                <p class="text-2xl sm:text-3xl font-black text-orange-500 mt-1">{{ stats.projects_assigned_twice }}</p>
+            </article>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-md border border-slate-200 p-4 mb-4">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Rechercher un étudiant, matricule ou projet..."
+                    class="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-iai-blue focus:border-transparent text-sm sm:text-base"
+                >
+                <div class="flex gap-2">
+                    <button id="filterAll" class="px-3 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100">Tous</button>
+                    <button id="filterRecent" class="px-3 py-2 text-xs sm:text-sm rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100">7 derniers jours</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200 mb-8">
+            <div class="px-4 sm:px-6 py-4 bg-iai-blue text-white font-semibold flex items-center justify-between">
+                <span>Attributions de Projets</span>
+                <span id="resultsCount" class="text-xs text-blue-100"></span>
+            </div>
+
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Étudiant</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Matricule</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Projet</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Étudiant</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Matricule</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Projet</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Action</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200" id="assignmentsTable">
-                        {% for assignment in assignments %}
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4">{{ assignment.student_name }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ assignment.student_matricule }}</td>
-                            <td class="px-6 py-4 font-medium text-iai-blue">{{ assignment.project_title }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ assignment.assigned_at[:10] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
+                    <tbody class="divide-y divide-slate-200" id="assignmentsTable"></tbody>
                 </table>
             </div>
-        </div>
 
-        <!-- Recent Activity Logs -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 bg-gray-800 text-white font-semibold">
-                Activité Récente
+            <div id="assignmentsCards" class="md:hidden p-3 space-y-3"></div>
+        </section>
+
+        <section class="bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200">
+            <div class="px-4 sm:px-6 py-4 bg-slate-900 text-white font-semibold flex items-center justify-between">
+                <span>Activité Récente</span>
+                <span class="text-xs text-slate-300">{{ recent_logs|length }} évènement(s)</span>
             </div>
-            <div class="p-6 space-y-3">
+            <div class="p-4 sm:p-6 space-y-3">
                 {% for log in recent_logs %}
-                <div class="flex items-start space-x-3 pb-3 border-b border-gray-200">
-                    <div class="flex-shrink-0">
+                <div class="flex items-start gap-3 pb-3 border-b border-slate-200">
+                    <div class="shrink-0">
                         {% if log.success %}
-                        <span class="inline-block w-2 h-2 bg-green-500 rounded-full mt-2"></span>
+                        <span class="inline-block w-2.5 h-2.5 bg-green-500 rounded-full mt-1.5"></span>
                         {% else %}
-                        <span class="inline-block w-2 h-2 bg-red-500 rounded-full mt-2"></span>
+                        <span class="inline-block w-2.5 h-2.5 bg-red-500 rounded-full mt-1.5"></span>
                         {% endif %}
                     </div>
                     <div class="flex-1">
-                        <div class="text-sm font-medium text-gray-900">
-                            {{ log.student.full_name if log.student else 'Système' }} - {{ log.action }}
+                        <div class="text-sm font-semibold text-slate-900 break-words">
+                            {{ log.student.full_name if log.student else 'Système' }}
+                            <span class="text-slate-500 font-normal">| {{ log.action }}</span>
                         </div>
-                        <div class="text-xs text-gray-500">
-                            {{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
-                            {% if log.contact_method %} | {{ log.contact_method }}{% endif %}
-                            {% if log.sms_provider %} | {{ log.sms_provider }}{% endif %}
+                        <div class="text-xs text-slate-500 flex flex-wrap gap-x-2 gap-y-1 mt-1">
+                            <span>{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                            {% if log.contact_method %}<span>• {{ log.contact_method }}</span>{% endif %}
+                            {% if log.sms_provider %}<span>• {{ log.sms_provider }}</span>{% endif %}
                         </div>
+                        {% if log.error_message %}
+                        <p class="text-xs text-red-600 mt-1 break-words">{{ log.error_message }}</p>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 </div>
 
 <script>
-    // Search functionality
     let allAssignments = {{ assignments | tojson }};
+    let recentOnly = false;
 
-    document.getElementById('searchInput').addEventListener('input', (e) => {
-        const search = e.target.value.toLowerCase();
-        const filtered = allAssignments.filter(a =>
-            a.student_name.toLowerCase().includes(search) ||
-            a.project_title.toLowerCase().includes(search)
-        );
+    function renderAssignments() {
+        const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
+
+        const filtered = allAssignments.filter((a) => {
+            const byText =
+                a.student_name.toLowerCase().includes(search) ||
+                a.student_matricule.toLowerCase().includes(search) ||
+                a.project_title.toLowerCase().includes(search);
+
+            if (!byText) return false;
+            if (!recentOnly) return true;
+
+            const assignedAt = new Date(a.assigned_at);
+            return assignedAt >= sevenDaysAgo;
+        });
+
+        const countEl = document.getElementById('resultsCount');
+        if (countEl) {
+            countEl.textContent = `${filtered.length} résultat(s)`;
+        }
 
         const tbody = document.getElementById('assignmentsTable');
-        tbody.innerHTML = filtered.map(a => `
-        <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4">${a.student_name}</td>
-            <td class="px-6 py-4 text-sm text-gray-500">${a.student_matricule}</td>
-            <td class="px-6 py-4 font-medium text-iai-blue">${a.project_title}</td>
-            <td class="px-6 py-4 text-sm text-gray-500">${a.assigned_at.substring(0, 10)}</td>
-        </tr>
-    `).join('');
+        if (tbody) {
+            tbody.innerHTML = filtered.map(a => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-6 py-4 font-semibold text-slate-800">${a.student_name}</td>
+                    <td class="px-6 py-4 text-slate-600">${a.student_matricule}</td>
+                    <td class="px-6 py-4 font-medium text-iai-blue">${a.project_title}</td>
+                    <td class="px-6 py-4 text-slate-500">${new Date(a.assigned_at).toLocaleString('fr-FR')}</td>
+                    <td class="px-6 py-4">
+                        <a href="/admin/api/export-student-theme/${a.id}" target="_blank"
+                           class="inline-flex items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-bold text-iai-blue hover:bg-blue-100">
+                            PDF thème
+                        </a>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        const cards = document.getElementById('assignmentsCards');
+        if (cards) {
+            cards.innerHTML = filtered.map(a => `
+                <article class="border border-slate-200 rounded-xl p-3 bg-white shadow-sm">
+                    <p class="text-sm font-bold text-slate-900">${a.student_name}</p>
+                    <p class="text-xs text-slate-500 mt-0.5">${a.student_matricule}</p>
+                    <p class="text-sm font-semibold text-iai-blue mt-2">${a.project_title}</p>
+                    <p class="text-xs text-slate-500 mt-1">${new Date(a.assigned_at).toLocaleString('fr-FR')}</p>
+                    <a href="/admin/api/export-student-theme/${a.id}" target="_blank"
+                       class="inline-flex mt-2 items-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-bold text-iai-blue hover:bg-blue-100">
+                        Télécharger le thème PDF
+                    </a>
+                </article>
+            `).join('');
+        }
+    }
+
+    document.getElementById('searchInput')?.addEventListener('input', renderAssignments);
+    document.getElementById('filterAll')?.addEventListener('click', () => {
+        recentOnly = false;
+        renderAssignments();
     });
+    document.getElementById('filterRecent')?.addEventListener('click', () => {
+        recentOnly = true;
+        renderAssignments();
+    });
+
+    document.addEventListener('DOMContentLoaded', renderAssignments);
 
     async function logout() {
         try {

@@ -127,3 +127,36 @@ def get_all_assignments(db: Session, search: str = None):
         }
         for a in assignments
     ]
+
+
+def get_latest_assignment_for_student(db: Session, student_id: int) -> Optional[dict]:
+    """
+    Get the latest assignment details for a student.
+
+    Args:
+        db: Database session
+        student_id: Student ID
+
+    Returns:
+        Optional[dict]: Assignment details or None
+    """
+    assignment = (
+        db.query(Assignment)
+        .join(Student)
+        .join(Project)
+        .filter(Assignment.student_id == student_id)
+        .order_by(Assignment.assigned_at.desc())
+        .first()
+    )
+
+    if not assignment:
+        return None
+
+    return {
+        "id": assignment.id,
+        "student_name": assignment.student.full_name,
+        "student_matricule": assignment.student.matricule,
+        "project_title": assignment.project.title,
+        "project_description": assignment.project.description,
+        "assigned_at": assignment.assigned_at.isoformat(),
+    }
